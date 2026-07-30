@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>县域农资店 · AI农户客户运营系统</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<a href="#main-content" class="skip-link">跳到主内容</a>
+
+<aside class="sidebar" id="sidebar" role="navigation" aria-label="主导航">
+  <div class="sidebar-logo"><div><h2>🌾 农资CRM</h2><small>AI农户运营系统 v4.0</small></div><button class="menu-toggle" id="menu-close" onclick="toggleSidebar()" aria-label="关闭菜单">✕</button></div>
+  <nav class="sidebar-nav" aria-label="页面导航">
+    <div class="nav-item active" data-page="dashboard" role="menuitem" tabindex="0"><span class="nav-icon" aria-hidden="true">📊</span> 运营总览</div>
+    <div class="nav-item" data-page="farmers" role="menuitem" tabindex="0"><span class="nav-icon" aria-hidden="true">🌱</span> 农户档案</div>
+    <div class="nav-item" data-page="messages" role="menuitem" tabindex="0"><span class="nav-icon" aria-hidden="true">📬</span> 消息中心</div>
+    <div class="nav-item" data-page="chat" role="menuitem" tabindex="0"><span class="nav-icon" aria-hidden="true">🤖</span> 农技答疑</div>
+    <div class="nav-item" data-page="debts" role="menuitem" tabindex="0"><span class="nav-icon" aria-hidden="true">💰</span> 账期管理</div>
+    <div class="nav-item" data-page="datasource" role="menuitem" tabindex="0"><span class="nav-icon" aria-hidden="true">📋</span> 数据来源</div>
+    <div class="nav-item" data-page="weather" role="menuitem" tabindex="0"><span class="nav-icon" aria-hidden="true">🌤️</span> 天气预报 <span style="font-size:9px;opacity:0.7;margin-left:auto" id="weather-status-dot">●</span></div>
+    <div class="nav-item" data-page="market" role="menuitem" tabindex="0"><span class="nav-icon" aria-hidden="true">📈</span> 行情价格 <span style="font-size:9px;opacity:0.7;margin-left:auto" id="market-status-dot">●</span></div>
+    <div class="nav-item" data-page="notify" role="menuitem" tabindex="0"><span class="nav-icon" aria-hidden="true">📲</span> 消息推送</div>
+  </nav>
+  <button class="theme-toggle" id="theme-toggle" title="切换深色/浅色模式">
+    <span class="theme-toggle-icon" id="theme-icon">🌙</span>
+    <span class="theme-toggle-label" id="theme-label">深色模式</span>
+  </button>
+  <div class="collapse-btn" id="collapse-btn" title="收缩侧边栏">
+    <span class="collapse-icon">◀</span>
+  </div>
+</aside>
+
+<div class="mobile-overlay" id="mobile-overlay" onclick="toggleSidebar()"></div>
+
+<nav class="bottom-nav" id="bottom-nav" role="navigation" aria-label="移动端导航">
+  <div class="bottom-nav-inner">
+    <div class="bottom-nav-item active" data-page="dashboard" role="button" tabindex="0" aria-label="运营总览"><span class="bn-icon" aria-hidden="true">📊</span>总览</div>
+    <div class="bottom-nav-item" data-page="farmers" role="button" tabindex="0" aria-label="农户档案"><span class="bn-icon" aria-hidden="true">🌱</span>农户</div>
+    <div class="bottom-nav-item" data-page="chat" role="button" tabindex="0" aria-label="农技答疑"><span class="bn-icon" aria-hidden="true">🤖</span>答疑</div>
+    <div class="bottom-nav-item" data-page="debts" role="button" tabindex="0" aria-label="账期管理"><span class="bn-icon" aria-hidden="true">💰</span>账期</div>
+    <div class="bottom-nav-item" data-page="messages" role="button" tabindex="0" aria-label="消息中心"><span class="bn-icon" aria-hidden="true">📬</span>消息</div>
+  </div>
+</nav>
+
+<main class="main" id="main-content" role="main" aria-label="主内容区">
+  <div class="pull-refresh" id="pull-refresh"><div class="pr-spinner"></div><div class="pr-text">↓ 下拉刷新</div></div>
+  <div class="main-header">
+    <button class="btn btn-outline btn-sm btn-icon" id="menu-open" onclick="toggleSidebar()">☰</button>
+    <h1 id="mobile-page-title">运营总览</h1>
+    <div class="top-actions">
+      <button class="btn btn-outline btn-sm btn-icon" onclick="applyTheme(!isDarkTheme)" title="切换主题" style="font-size:16px" id="mobile-theme-btn">🌙</button>
+      <button class="btn btn-outline btn-sm btn-icon" onclick="navigateTo(currentPage);showToast('已刷新','success')" title="刷新">🔄</button>
+    </div>
+  </div>
+
+  <section class="page active" id="page-dashboard">
+    <h2 style="margin-bottom:20px">运营总览</h2>
+    <div class="stats-grid" id="dash-stats"><div class="stat-card skeleton skel-card"></div><div class="stat-card skeleton skel-card"></div><div class="stat-card skeleton skel-card"></div><div class="stat-card skeleton skel-card"></div><div class="stat-card skeleton skel-card"></div><div class="stat-card skeleton skel-card"></div></div>
+    <div class="card" style="margin-bottom:20px" id="price-index-card">
+      <div class="card-header"><h3>📊 全国农产品批发价格指数 <span style="font-size:12px;color:var(--text3);font-weight:400">2026-07-23</span></h3></div>
+      <div id="price-indices"><div class="skeleton skel-row"></div></div>
+      <div style="font-size:10px;color:var(--text3);margin-top:8px">数据来源: 农业农村部全国农产品批发市场价格信息系统 (pfsc.agri.cn)</div>
+    </div>
+    <div class="two-col">
+      <div class="card"><div class="card-header"><h3>📅 今日节点提醒</h3></div><div id="today-nodes"><div class="skeleton skel-row"></div></div></div>
+      <div class="card"><div class="card-header"><h3>📋 最近动态</h3></div><div id="recent-activities" style="max-height:250px;overflow-y:auto"><div class="skeleton skel-row"></div></div></div>
+    </div>
+  </section>
+
+  <section class="page" id="page-farmers">
+    <div class="card-header" style="margin-bottom:16px"><h2>🌱 农户档案管理</h2>
+      <div class="search-bar">
+        <input type="text" id="farmer-search" placeholder="搜索农户..." oninput="debouncedRenderFarmers()">
+        <select id="farmer-filter-cat" onchange="renderFarmers()"><option value="">全部类型</option><option value="种植">种植</option><option value="养殖">养殖</option></select>
+        <button class="btn btn-primary" onclick="openFarmerModal()">+ 添加农户</button>
+      </div>
+    </div>
+    <div class="card table-wrap"><table><thead><tr><th>姓名</th><th>电话</th><th>地址</th><th>类型</th><th>品类</th><th>规模</th><th>开始日期</th><th>周期</th><th>进度</th><th>操作</th></tr></thead><tbody id="farmer-table"><tr><td colspan="10" style="text-align:center;padding:30px"><div class="skeleton skel-row"></div></td></tr></tbody></table></div>
+    <div class="card-list" id="farmer-card-list"></div>
+  </section>
+
+  <section class="page" id="page-messages">
+    <div class="card-header" style="margin-bottom:16px"><h2>📬 消息中心</h2>
+      <div class="search-bar">
+        <select id="msg-filter-type" onchange="renderMessages()"><option value="">全部类型</option><option value="节点提醒">节点提醒</option></select>
+        <select id="msg-filter-status" onchange="renderMessages()"><option value="">全部状态</option><option value="待发送">待发送</option><option value="已发送">已发送</option></select>
+        <button class="btn btn-accent" onclick="sendTodayMessages()">📤 一键发送</button>
+      </div>
+    </div>
+    <div class="card msg-list" id="msg-list"><div class="skeleton skel-row"></div></div>
+    <div class="card-list" id="msg-card-list"></div>
+  </section>
+
+  <section class="page" id="page-chat">
+    <h2 style="margin-bottom:16px">🤖 农技AI答疑</h2>
+    <div class="two-col">
+      <div><div class="chat-container"><div class="chat-messages" id="chat-messages"><div class="chat-msg ai">您好！我是农技AI助手，基于真实政府技术指导意见和监测数据为您解答。<br><br>支持：病虫害诊断、施肥方案、饲料配方、防疫免疫、市场价格、天气应对。<br><br>请直接描述您遇到的问题，例如"水稻叶子发黄怎么办？"</div></div>
+      <div class="quick-questions" id="quick-questions"></div>
+      <div class="chat-input-area"><textarea id="chat-input" placeholder="输入问题，Enter发送 / Shift+Enter换行" rows="1"></textarea><button id="btn-send-chat" onclick="sendChat()">发送</button></div></div></div>
+      <div class="card"><div class="card-header"><h3>📝 答疑记录</h3></div><div id="chat-history" style="max-height:420px;overflow-y:auto"></div></div>
+    </div>
+  </section>
+
+  <section class="page" id="page-debts">
+    <div class="card-header" style="margin-bottom:16px"><h2>💰 账期管理</h2>
+      <div class="search-bar">
+        <select id="debt-filter-status" onchange="renderDebts()"><option value="">全部</option><option value="待还">待还</option><option value="逾期">逾期</option><option value="已还">已还</option></select>
+        <button class="btn btn-accent" onclick="checkOverdue()">🔍 检查逾期</button>
+        <button class="btn btn-primary" onclick="openDebtModal()">+ 新建赊账</button>
+      </div>
+    </div>
+    <div class="card table-wrap"><table><thead><tr><th>农户</th><th>金额(元)</th><th>商品明细</th><th>赊账日期</th><th>到期日期</th><th>状态</th><th>操作</th></tr></thead><tbody id="debt-table"><tr><td colspan="7" style="text-align:center;padding:30px"><div class="skeleton skel-row"></div></td></tr></tbody></table></div>
+    <div class="card-list" id="debt-card-list"></div>
+  </section>
+
+  <section class="page" id="page-datasource">
+    <h2 style="margin-bottom:16px">📋 示范数据来源说明</h2>
+    <p style="color:var(--text2);font-size:13px;margin-bottom:20px">本系统所有示范数据均来自公开可查的政府监测报告、学术调研和官方技术指南，确保场景真实可信。</p>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(360px,1fr));gap:16px">
+      <div class="card" style="padding:18px"><h3 style="font-size:15px;margin-bottom:12px">🏭 农资价格（2026年7月）</h3><table style="font-size:13px"><tr><td style="padding:5px 0;color:var(--text2)">国产尿素(46%)</td><td style="text-align:right;font-weight:600">~1,890 元/吨</td><td style="text-align:right;color:var(--text2);font-size:11px">95元/50kg袋</td></tr><tr><td style="padding:5px 0;color:var(--text2)">复合肥(15-15-15)</td><td style="text-align:right;font-weight:600">~3,000 元/吨</td><td style="text-align:right;color:var(--text2);font-size:11px">155元/50kg袋</td></tr><tr><td style="padding:5px 0;color:var(--text2)">过磷酸钙(12%)</td><td style="text-align:right;font-weight:600">~700 元/吨</td><td style="text-align:right;color:var(--text2);font-size:11px">35元/50kg袋</td></tr><tr><td style="padding:5px 0;color:var(--text2)">磷酸二铵(64%)</td><td style="text-align:right;font-weight:600">~4,100-4,750 元/吨</td></tr><tr><td style="padding:5px 0;color:var(--text2)">豆粕</td><td style="text-align:right;font-weight:600">~2,700-2,916 元/吨</td></tr></table><div style="margin-top:10px;font-size:11px;color:var(--text3);border-top:1px solid var(--border);padding-top:8px">来源：[1] 宣城市发改委 · 2026.7.14 市场农资价格监测 · [2] 辽宁省农业农村厅 · 2026年第27周农资价格简讯</div></div>
+      <div class="card" style="padding:18px"><h3 style="font-size:15px;margin-bottom:12px">🏦 农村赊账行为调研</h3><table style="font-size:13px"><tr><td style="padding:5px 0;color:var(--text2)">赊账用途(化肥)</td><td style="text-align:right;font-weight:600;color:#16a34a">52.67%</td></tr><tr><td style="padding:5px 0;color:var(--text2)">赊账用途(农药)</td><td style="text-align:right;font-weight:600;color:#16a34a">32.74%</td></tr><tr><td style="padding:5px 0;color:var(--text2)">最大笔平均金额</td><td style="text-align:right;font-weight:600">~3,000 元</td></tr><tr><td style="padding:5px 0;color:var(--text2)">无金融机构行政村</td><td style="text-align:right;font-weight:600;color:#dc2626">88.89%</td></tr></table><div style="margin-top:10px;font-size:11px;color:var(--text3);border-top:1px solid var(--border);padding-top:8px">来源：[3] 暨南大学IESR · 广东千村调查(2019) · [10] 绍兴日报(2026.3)</div></div>
+      <div class="card" style="padding:18px"><h3 style="font-size:15px;margin-bottom:12px">🌱 种养周期（官方农事日历）</h3><table style="font-size:13px"><tr><td style="padding:5px 0;color:var(--text2)">水稻(单季中稻)</td><td style="text-align:right;font-weight:600">4月下旬→9月上中旬</td><td style="text-align:right;color:var(--text2);font-size:11px">~140天</td></tr><tr><td style="padding:5px 0;color:var(--text2)">冬小麦</td><td style="text-align:right;font-weight:600">10月→翌年5-6月</td><td style="text-align:right;color:var(--text2);font-size:11px">~235天</td></tr><tr><td style="padding:5px 0;color:var(--text2)">生猪育肥</td><td style="text-align:right;font-weight:600">180天</td></tr><tr><td style="padding:5px 0;color:var(--text2)">肉牛育肥</td><td style="text-align:right;font-weight:600">365天</td></tr><tr><td style="padding:5px 0;color:var(--text2)">蛋鸡</td><td style="text-align:right;font-weight:600">130天</td></tr></table><div style="margin-top:10px;font-size:11px;color:var(--text3);border-top:1px solid var(--border);padding-top:8px">来源：[4] 农业农村部 · 技术指导意见 · [6] 湖北省农业农村厅 · [8] 央视网</div></div>
+      <div class="card" style="padding:18px"><h3 style="font-size:15px;margin-bottom:12px">🐖 疫病防控预警</h3><table style="font-size:13px"><tr><td style="padding:5px 0;color:var(--text2)">副猪嗜血杆菌阳性率</td><td style="text-align:right;font-weight:600;color:#dc2626">保育猪 73%</td></tr><tr><td style="padding:5px 0;color:var(--text2)">猪场阳性率</td><td style="text-align:right;font-weight:600;color:#dc2626">53.91%</td></tr><tr><td style="padding:5px 0;color:var(--text2)">重点猪病</td><td style="text-align:right">非洲猪瘟/蓝耳/口蹄疫/PED</td></tr></table><div style="margin-top:10px;font-size:11px;color:var(--text3);border-top:1px solid var(--border);padding-top:8px">来源：[7] 驻马店市动物疫病防疫检疫中心(2025.10)</div></div>
+    </div>
+    <div style="margin-top:24px;padding-top:20px;border-top:2px dashed var(--border);text-align:center">
+      <p style="font-size:12px;color:var(--text2);margin-bottom:10px">⚠️ 如需清空所有数据并重新灌入示范数据：</p>
+      <button class="btn btn-outline btn-sm" onclick="showConfirm('确定要重置所有数据吗？当前所有数据将被清空，重新载入示范数据。','🔄',function(){resetAllData()})" style="border-color:var(--danger);color:var(--danger)">🔄 重置所有数据</button>
+    </div>
+  </section>
+
+  <section class="page" id="page-weather">
+    <div class="card-header" style="margin-bottom:16px"><h2>🌤️ 农事天气预报 <span style="font-size:10px;color:var(--text3);font-weight:400">v3.0 · 和风天气</span></h2>
+      <div class="search-bar" style="flex-wrap:wrap;gap:6px">
+        <select id="weather-region" onchange="onWeatherRegionChange()" style="min-width:80px"><option value="">选择大区</option></select>
+        <select id="weather-province" onchange="onWeatherProvinceChange()" style="min-width:90px"><option value="">选择省份</option></select>
+        <select id="weather-location" onchange="onWeatherLocationChange()" style="min-width:130px"><option value="">选择城市</option></select>
+        <button class="btn btn-sm btn-outline" onclick="loadWeather()" style="white-space:nowrap">🔄 刷新</button>
+        <span class="refresh-indicator" id="weather-auto-refresh" style="font-size:11px;color:var(--text3);margin-left:4px"></span>
+      </div>
+    </div>
+    <div id="weather-content"><div class="card"><div class="skeleton skel-row"></div></div></div>
+  </section>
+
+  <section class="page" id="page-market">
+    <div class="card-header" style="margin-bottom:16px"><h2>📈 农产品市场价格</h2>
+      <div class="search-bar" style="flex-wrap:wrap;gap:6px">
+        <select id="market-region" onchange="renderMarketPrices()" style="min-width:110px">
+          <option value="">全国均价</option>
+          <option value="华东">📌 华东(山东寿光)</option>
+          <option value="华南">📌 华南(广州江南)</option>
+          <option value="华中">📌 华中(郑州万邦)</option>
+          <option value="华北">📌 华北(北京新发地)</option>
+          <option value="西南">📌 西南(成都濛阳)</option>
+          <option value="西北">📌 西北(西安欣桥)</option>
+          <option value="东北">📌 东北(哈尔滨润恒)</option>
+        </select>
+        <select id="market-cat" onchange="renderMarketPrices()">
+          <option value="">全部品类</option>
+          <option value="粮油">粮油</option>
+          <option value="畜禽水产">畜禽水产</option>
+          <option value="蔬菜">蔬菜</option>
+          <option value="化肥农资">化肥农资</option>
+          <option value="饲料">饲料</option>
+        </select>
+        <button class="btn btn-sm btn-outline" onclick="refreshMarketPrices()">🔄 刷新行情</button>
+      </div>
+    </div>
+    <div class="card" id="market-content"><div class="skeleton skel-row"></div></div>
+  </section>
+
+  <section class="page" id="page-notify">
+    <h2 style="margin-bottom:16px">📲 消息推送模拟</h2>
+    <p style="color:var(--text2);font-size:13px;margin-bottom:18px">模拟农资店通过短信/微信/APP向农户推送节点提醒、农技资讯和账期通知的过程。</p>
+    <div class="notify-panel">
+      <div class="notify-phone">
+        <div class="phone-screen">
+          <div class="phone-status"><span>09:41</span><span>🔋 📶</span></div>
+          <div class="phone-notifs" id="phone-notifs">
+            <div class="phone-notif n-app"><span class="n-type n-type-app">农资CRM</span><span class="n-time">刚刚</span><div class="n-sender">🌾 清溪农资店</div><div class="n-body">张建国您好，水稻即将进入拔节孕穗期，建议追施复合肥。到店选购有优惠！</div></div>
+            <div class="phone-notif n-sms"><span class="n-type n-type-sms">短信</span><span class="n-time">昨天</span><div class="n-sender">清溪农资店</div><div class="n-body">【账期提醒】尊敬的张建国，您有一笔复合肥赊账3920元将于8月到期，收成后方便时来结算即可。祝丰收！</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="notify-stats">
+        <div class="card" style="margin-bottom:14px"><h3 style="margin-bottom:12px">📊 推送统计</h3><div id="notify-stats-content"><div class="skeleton skel-row"></div></div></div>
+        <div class="card notify-templates"><h3 style="margin-bottom:12px">📝 推送模板</h3><div id="notify-templates"><div class="skeleton skel-row"></div></div></div>
+        <div class="send-notify-btn"><button class="btn btn-primary" onclick="sendNotifyToAll()" style="width:100%">📤 向全部农户推送今日提醒</button></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<div id="modal-container" role="dialog" aria-modal="true" aria-label="模态框"></div>
+<div class="toast-container" id="toast-container" role="status" aria-live="polite" aria-atomic="true"></div>
+<div id="loading-overlay" style="position:fixed;inset:0;background:var(--bg);z-index:300;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px">
+  <div style="font-size:40px">🌾</div>
+  <div style="font-size:16px;font-weight:600;color:var(--text)">正在初始化系统...</div>
+  <div style="width:200px;height:4px;background:var(--border);border-radius:2px;overflow:hidden"><div id="load-bar" style="height:100%;background:var(--primary);width:0%;transition:width 0.3s;border-radius:2px"></div></div>
+  <div id="load-status" style="font-size:12px;color:var(--text3)">加载 SQL.js 引擎</div>
+</div>
+
+<script src="sql-wasm.js"></script>
+<script src="lib/persist.js"></script>
+<script src="lib/db.js"></script>
+<script src="lib/seed.js"></script>
+<script src="lib/ai.js"></script>
+<script src="lib/weather.js"></script>
+<script src="lib/market.js"></script>
+<script src="lib/notify.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

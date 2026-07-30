@@ -1,0 +1,8 @@
+node_modules/
+nongzi.db
+deploy/cloudflared.exe
+deploy/cloudflared2.exe
+deploy/tunnel.log
+*.zip
+.env
+.DS_Store
