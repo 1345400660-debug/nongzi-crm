@@ -1,3 +1,5 @@
+// 农资CRM 服务端代理 v4.1
+// 息壤杯全国人工智能OPC创新大赛 · 惠民产品创新赛道
 var http=require('http'),fs=require('fs'),path=require('path'),https=require('https'),zlib=require('zlib');
 var root=__dirname;
 var mime={'html':'text/html;charset=utf-8','js':'application/javascript','css':'text/css','png':'image/png','jpg':'image/jpeg','svg':'image/svg+xml','ico':'image/x-icon','json':'application/json','wasm':'application/wasm'};
